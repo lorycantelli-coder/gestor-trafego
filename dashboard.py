@@ -283,15 +283,35 @@ def load_sales_data(days):
         summary = api.get_sales_summary(days=days)
 
         return summary, insights, campaigns
+    except ValueError as e:
+        # Erro de configuração
+        return "CONFIG_ERROR", str(e), None
     except Exception as e:
-        st.error(f"❌ Erro: {str(e)}")
-        return None, None, None
+        # Erro de API ou conexão
+        return "API_ERROR", f"Erro na API: {str(e)}", None
 
 with st.spinner("⏳ Carregando..."):
     summary, insights, campaigns = load_sales_data(days)
 
+# Verificar erros de configuração
+if summary == "CONFIG_ERROR":
+    st.error(f"🔐 Erro de Configuração\n\n{insights}\n\n"
+             "📝 **Para Streamlit Cloud:**\n"
+             "1. Vá para Settings → Secrets\n"
+             "2. Adicione as variáveis:\n"
+             "   - META_ACCESS_TOKEN\n"
+             "   - META_AD_ACCOUNT_ID\n"
+             "   - META_APP_ID\n\n"
+             "📝 **Para Desenvolvimento Local:**\n"
+             "Crie ou edite `~/.env.meta-ads`")
+    st.stop()
+
+if summary == "API_ERROR":
+    st.error(f"🚨 Erro na API\n\n{insights}")
+    st.stop()
+
 if summary is None:
-    st.warning("⚠️ Sem dados disponíveis")
+    st.warning("⚠️ Sem dados disponíveis. Verifique se há campanhas com [VENDA] no nome.")
     st.stop()
 
 # ============================================

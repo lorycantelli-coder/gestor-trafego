@@ -10,15 +10,49 @@ from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.campaign import Campaign
 from facebook_business.adobjects.adsinsights import AdsInsights
 from dotenv import load_dotenv
+import streamlit as st
 
-# Carregar credenciais
-load_dotenv(os.path.expanduser('~/.env.meta-ads'))
+# Carregar credenciais em ordem de precedência:
+# 1. Streamlit Secrets (Streamlit Cloud)
+# 2. .env.meta-ads (Desenvolvimento local)
+# 3. Variáveis de ambiente
+
+def get_credential(key):
+    """Obtém credencial de múltiplas fontes"""
+    # Tentar Streamlit secrets primeiro (Streamlit Cloud)
+    if hasattr(st, 'secrets') and key in st.secrets:
+        return st.secrets[key]
+
+    # Tentar variáveis de ambiente
+    if key in os.environ:
+        return os.environ[key]
+
+    # Tentar arquivo .env.meta-ads (desenvolvimento)
+    load_dotenv(os.path.expanduser('~/.env.meta-ads'))
+    return os.getenv(key)
 
 class MetaAdsAPI:
     def __init__(self):
-        self.access_token = os.getenv('META_ACCESS_TOKEN')
-        self.ad_account_id = f"act_{os.getenv('META_AD_ACCOUNT_ID')}"
-        self.app_id = os.getenv('META_APP_ID')
+        self.access_token = get_credential('META_ACCESS_TOKEN')
+        self.ad_account_id = f"act_{get_credential('META_AD_ACCOUNT_ID')}"
+        self.app_id = get_credential('META_APP_ID')
+
+        # Validar credenciais
+        if not self.access_token:
+            raise ValueError(
+                "❌ META_ACCESS_TOKEN não configurado!\n"
+                "Configure nos Secrets do Streamlit Cloud ou em ~/.env.meta-ads"
+            )
+        if not self.ad_account_id or self.ad_account_id == "act_None":
+            raise ValueError(
+                "❌ META_AD_ACCOUNT_ID não configurado!\n"
+                "Configure nos Secrets do Streamlit Cloud ou em ~/.env.meta-ads"
+            )
+        if not self.app_id:
+            raise ValueError(
+                "❌ META_APP_ID não configurado!\n"
+                "Configure nos Secrets do Streamlit Cloud ou em ~/.env.meta-ads"
+            )
 
         # Inicializar API
         FacebookAdsApi.init(
