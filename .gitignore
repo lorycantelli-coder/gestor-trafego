@@ -1,63 +1,7 @@
-# Ambiente Virtual
+.git/
 venv/
-env/
-ENV/
-.venv
-
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Logs
+*.pyc
+.env*
 logs/
-*.log
-
-# Streamlit
 .streamlit/secrets.toml
-
-# Ambiente
-.env
-.env.local
-.env.*.local
-~/.env.meta-ads
-
-# Cache
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Dados locais
-data/
-*.csv
-*.xlsx
-
-# Arquivos temporários
-tmp/
-temp/
-*.tmp
